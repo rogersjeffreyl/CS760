@@ -1,0 +1,52 @@
+#!/Users/quickstep/anaconda2/bin/python
+#!/usr/bin/python
+import sys
+from knn_class import KNN
+from arff_parser import ARFF_Parser
+import pandas as pd
+from collections import defaultdict
+train_parser = ARFF_Parser()
+train_parser.parse(sys.argv[1])
+train_data = train_parser.data
+test_parser = ARFF_Parser()
+test_parser.parse(sys.argv[2])
+test_data = test_parser.data
+num_mis =  defaultdict()
+abs_error = defaultdict()
+for k in [int(sys.argv[3]), int(sys.argv[4]) ,int(sys.argv[5]) ]:
+    num_mis[k] =0
+    abs_error[k] = 0
+    for i in xrange(0,len(train_data)):
+        if i==0:    
+            filtered_data = train_data[i+1 :]
+        elif i==len(train_data)-1:    
+            filtered_data = train_data[0 :i]    
+        else:
+            filtered_data = train_data[0:i] + train_data[i+1 :]
+        knn =KNN(filtered_data, [train_data[i]], train_parser)
+        knn.fit()
+        knn.predict(k,False)
+        num_mis[k]+=knn.num_mis_classified
+        abs_error[k] += knn.accuracy
+    if train_parser.dependent_attribute == "response":
+      print "Mean absolute error for k = {0} : {1:.15f}".format(k,float(abs_error[k])/len(train_data))
+    else:
+      print "Number of incorrectly classified instances for k = {0} : {1}".format(k,num_mis[k]) 		
+min_value = 10000
+min_k=0
+if train_parser.dependent_attribute == "class":
+    for k,v in num_mis.iteritems():
+        if num_mis[k] < min_value:
+            min_value=num_mis[k]
+            min_k =k
+else:
+   for k,v in num_mis.iteritems():
+          if abs_error[k] < min_value:
+             min_value=abs_error[k]
+             min_k =k
+  
+	
+print "Best k value : {0}".format(min_k)
+knn =KNN(train_data, test_data, train_parser)
+knn.fit()
+knn.predict(min_k)   

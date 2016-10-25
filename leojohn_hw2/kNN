@@ -1,0 +1,17 @@
+#!/Users/quickstep/anaconda2/bin/python
+#!/usr/bin/python
+import sys
+from knn_class import KNN
+from arff_parser import ARFF_Parser
+import pandas as pd
+train_parser = ARFF_Parser()
+train_parser.parse(sys.argv[1])
+train_data = train_parser.data
+test_parser = ARFF_Parser()
+test_parser.parse(sys.argv[2])
+test_data= test_parser.data
+knn =KNN(train_data, test_data, train_parser)
+knn.fit()
+k = int(sys.argv[3])
+print "k value : {0}".format(k)
+knn.predict(k)

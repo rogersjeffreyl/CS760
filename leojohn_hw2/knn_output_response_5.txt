@@ -1,0 +1,4 @@
+k value : 5
+Predicted value : 6.400000	Actual value : 6.000000
+Mean absolute error : 0.4000000000000004
+Total number of instances : 1
