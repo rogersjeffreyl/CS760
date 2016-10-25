@@ -51,14 +51,24 @@ class KNN:
             right_points = join[right_columns]
             join['distance']= np.sqrt(np.sum(np.square(np.subtract(left_points,right_points)),axis=1))
             k_nearest_neighbors_data =join.groupby('index_y').apply(
-                lambda dfg: dfg.nsmallest(k, columns=['distance','index_x'])
+                #lambda dfg: dfg.nsmallest(k, columns=['distance','index_x'])
+               lambda dfg: dfg.sort(['distance','index_x']).head(k) 
             )
             knnd =k_nearest_neighbors_data[['index_x','{0}_x'.format(self.parser.dependent_attribute),'distance','{0}_y'.format(self.parser.dependent_attribute)]]
             #Original response variables
-            original_response_variables = self.parser.attribute_val_map[self.parser.dependent_attribute]
-            for cls in original_response_variables:
+            original_response_variables = None
+            try:
+               original_response_variables = self.parser.attribute_val_map[self.parser.dependent_attribute]
+            except:
+             pass 
+             #print self.parser.attribute_val_map
+             #exit()
+            try: 
+             for cls in original_response_variables:
                 for cls1 in original_response_variables:
                     self.confusion_matrix[cls][cls1]=0
+            except:
+              pass
             for group, new_df in knnd.groupby(level=0):
                 
                 dataframe_dict = new_df.reset_index().to_dict()

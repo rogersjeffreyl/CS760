@@ -26,8 +26,9 @@ class ARFF_Parser:
                 self.dependent_attribute = attr.lower()
                 self.task_type =self.task_types[attr.lower()]
                 break
-        
+        #print loaded_data[1].__repr__()        
         nominal_attrs = re.findall(r"(.*)'s type is nominal,\s*range is (.*)",loaded_data[1].__repr__())     
+        #print nominal_attrs
         for attrs,val in nominal_attrs:
             self.attribute_val_map[attrs.lstrip()] =   eval(val)
         
