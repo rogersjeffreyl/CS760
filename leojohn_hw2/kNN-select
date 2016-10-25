@@ -1,9 +1,11 @@
+#!/usr/bin/env python
 #!/Users/quickstep/anaconda2/bin/python
 #!/usr/bin/python
 import sys
 from knn_class import KNN
 from arff_parser import ARFF_Parser
 import pandas as pd
+import numpy as np
 from collections import defaultdict
 train_parser = ARFF_Parser()
 train_parser.parse(sys.argv[1])
@@ -22,8 +24,8 @@ for k in [int(sys.argv[3]), int(sys.argv[4]) ,int(sys.argv[5]) ]:
         elif i==len(train_data)-1:    
             filtered_data = train_data[0 :i]    
         else:
-            filtered_data = train_data[0:i] + train_data[i+1 :]
-        knn =KNN(filtered_data, [train_data[i]], train_parser)
+            filtered_data =np.concatenate( (train_data[0:i] , train_data[i+1 :]),axis =0 )
+        knn =KNN(filtered_data, train_data[np.ix_([i][:])], train_parser)
         knn.fit()
         knn.predict(k,False)
         num_mis[k]+=knn.num_mis_classified

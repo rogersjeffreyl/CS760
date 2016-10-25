@@ -44,6 +44,7 @@ class KNN:
             self.train_data.reset_index(inplace=True)
 
             self.test_data.reset_index(inplace=True)
+            #print self.test_data.columns
             join=pd.merge(self.train_data,self.test_data,on="dummy_join_key")
             left_columns = [col+"_x" for col in feature_columns]
             right_columns = [col+"_y" for col in feature_columns]
