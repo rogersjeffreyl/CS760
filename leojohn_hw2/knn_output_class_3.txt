@@ -445,5 +445,4 @@ Predicted class : CYT	Actual class : MIT
 Predicted class : CYT	Actual class : MIT
 Predicted class : ME3	Actual class : ME2
 Number of correctly classified instances : 238
-Total number of instances : 445
-Accuracy : 0.5348314606741573
+Total number of instances : 445Accuracy : 0.5348314606741573
