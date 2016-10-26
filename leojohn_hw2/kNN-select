@@ -31,7 +31,7 @@ for k in [int(sys.argv[3]), int(sys.argv[4]) ,int(sys.argv[5]) ]:
         num_mis[k]+=knn.num_mis_classified
         abs_error[k] += knn.accuracy
     if train_parser.dependent_attribute == "response":
-      print "Mean absolute error for k = {0} : {1:.15f}".format(k,float(abs_error[k])/len(train_data))
+      print "Mean absolute error for k = {0} : {1:.16f}".format(k,float(abs_error[k])/len(train_data))
     else:
       print "Number of incorrectly classified instances for k = {0} : {1}".format(k,num_mis[k]) 		
 min_value = 10000
