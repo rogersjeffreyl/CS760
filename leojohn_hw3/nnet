@@ -1,0 +1,86 @@
+#!/usr/bin/python
+import sys
+from ANN import ANN
+import pandas as pd
+import numpy as np
+import random
+from arff_parser import ARFF_Parser
+train_parser =  ARFF_Parser()
+train_parser.parse(sys.argv[4])
+test_parser = ARFF_Parser()
+test_parser.parse(sys.argv[5])
+random.seed(42)
+np.random.seed(42)
+
+train_data = pd.DataFrame(train_parser.data)
+#random shuffle of the data.
+train_data = train_data.reindex(np.random.permutation(train_data.index))
+# Standardizing the feature values  in train  
+for col in train_parser.type_attribute_map["numeric"]:
+    train_data[col] = (train_data[col] - train_data[col].mean())/train_data[col].std()    
+
+for col in train_parser.type_attribute_map["real"]:
+    train_data[col] = train_data[col] - train_data[col].mean()/train_data[col].std()    
+
+feature_columns = list(set(train_data.columns).difference(set([train_parser.dependent_attribute])))
+train_X = train_data[feature_columns]
+#one_of_k_encoding
+nominal_attributes = list(set(train_parser.type_attribute_map["nominal"]).difference(set([train_parser.dependent_attribute])))
+for attr in nominal_attributes:
+    for val in train_parser.attribute_val_map[attr]:
+        column_name = attr+"_"+val
+        train_X[column_name] =0
+        #print train_data[train_data[attr] == val][column_name]=1
+        train_X[column_name] = train_X[attr].apply(lambda x: 1 if x==val else 0)
+    train_X.drop(attr,axis=1,inplace=True)
+    
+
+
+
+label_column = train_parser.dependent_attribute
+
+#Adding bias term
+train_X["bias"]=1 
+
+train_y= train_data[label_column]
+#Encoding class atributes
+train_y = train_y.apply(lambda x: np.where(np.unique(train_data[train_parser.dependent_attribute].values) == x)[0][0])
+
+#test_data
+test_data = pd.DataFrame(test_parser.data)
+# Standardizing the feature values  in test  
+for col in test_parser.type_attribute_map["numeric"]:
+    test_data[col] = (test_data[col] - test_data[col].mean())/test_data[col].std()
+
+for col in test_parser.type_attribute_map["real"]:
+    test_data[col] = (test_data[col] - test_data[col].mean())/test_data[col].std()    
+
+feature_columns = list(set(test_data.columns).difference(set([test_parser.dependent_attribute])))
+test_X = test_data[feature_columns]
+#one_of_k_encoding
+nominal_attributes = list(set(test_parser.type_attribute_map["nominal"]).difference(set([test_parser.dependent_attribute])))
+for attr in nominal_attributes:
+    for val in test_parser.attribute_val_map[attr]:
+        column_name = attr+"_"+val
+        test_X[column_name] =0
+        #print test_data[test_data[attr] == val][column_name]=1
+        test_X[column_name] = test_X[attr].apply(lambda x: 1 if x==val else 0)
+    test_X.drop(attr,axis=1,inplace=True)
+    
+#random shuffle of the data.
+#test_data = test_data.reindex(np.random.permutation(test_data.index))
+
+
+label_column = test_parser.dependent_attribute
+
+#Adding bias term
+test_X["bias"]=1 
+
+test_y= test_data[label_column]
+#Encoding class atributes
+test_y = test_y.apply(lambda x: np.where(np.unique(test_data[test_parser.dependent_attribute].values) == x)[0][0])
+
+ann = ANN(int(sys.argv[2]),train_X.values,train_y.values)
+ann.fit(float(sys.argv[1]),int(sys.argv[3]))
+ann.predict(test_X.values,test_y.values)
+
