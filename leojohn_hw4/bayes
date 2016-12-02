@@ -1,0 +1,16 @@
+#!/usr/bin/python
+import arff_parser
+import pandas as pd
+import numpy as np
+import sys
+from naive_bayes import NaiveBayes
+from collections import defaultdict
+train_parser = arff_parser.ARFF_Parser()
+test_parser = arff_parser.ARFF_Parser()
+train_parser.parse(sys.argv[1])
+test_parser.parse(sys.argv[2])
+train_data = pd.DataFrame(train_parser.data)
+test_data = pd.DataFrame(test_parser.data)
+nb_classifier = NaiveBayes(train_parser,sys.argv[3])
+nb_classifier.fit(train_data)
+nb_classifier.predict(test_parser.data)
